@@ -1,124 +1,88 @@
 // import monigota from '../images/monigota.png';
-import '../styles/main.scss';
+import '../styles/App.scss';
 import {useState, useEffect} from 'react';
 import React from 'react';
 import callToApi from '../services/api';
+import Header from './Header';
+import Dummy from './Dummy';
+import SolutionLetters from './SolutionLetters';
+
 
 function App() {
   // VARIABLES ESTADO
-  const [numberOfErrors, setNumberOfErrors] = useState(0);
-  const [lastLetter, setLastLetter ] = useState('');
-  const [word, setWord] = useState('katakroker'); //enlazar API
-  const [userLetters, setUserLetters] = useState([]);
 
-  // POR QUE TRES CONSTANTES???
-  // const [word, setWord] = useState('');
-  // const [userLetters, setUserLetters] = useState([]);
-  // const [lastLetter, setLastLetter] = useState('');
-
-  // useEffect(() => {
-  //   callToApi().then((response) => {
-  //     setWord(response)
-  //     console.log(response);
-  //   });
-  // },[]);
+  // Varible estado para incrementar el número de fallos
+  // const [numberOfErrors, setNumberOfErrors] = useState(0);
+  //Variable estado para guardar el carácter introducido en el input
+  const [lastLetter, setLastLetter] = useState('');
+  // Variable estado para almacenar la palabra que se deberá adivinar.
+  const [word, setWord] = useState('Katakroker');
+  // Variable estado para para almacenar y pintar las letras que introduce la jugadora.
+  const [userLetter, setUserLetter] = useState([]);
 
 
-    // FUNCIONES
+// Llamada a al Api 
+
+  useEffect(() => {
+    callToApi().then((response) => {
+      setWord(response)
+      console.log(response);
+    });
+  },[]);
+
+  
+  //------------------------------------ FUNCIONES-----------------------------------------------
+
   const formSubmit =(e)=>{
     e.preventDefault();
-  }
+  };
 
-  const increment = () => {
-    setNumberOfErrors(numberOfErrors+1);
-    if(numberOfErrors === 13){
-      
+  //funcion para pintar en el ahorcado los errores
+  
+  const getNumberOfErrors = () => {
+    const numberError = userLetter.filter((letter) => !word.includes(letter));
+    return numberError.length;
+  };
+
+  // función para almacenar letra introducida por el usuario
+
+  const handleInputLetter = (ev) => {
+    // Hemos creado una constante regex para definir los caracteres válidos
+    const regex = /^[A-Za-zÑñÁáÉéÍíÓóÚúÜü]+$/;
+    // Vamos a hacer una condicional mediante el método .test, para testear un match en un string. Si lo encuentra devuelve true, sino false.
+    if (regex.test(ev.target.value)){
+      setLastLetter(ev.target.value);
+      // ponemos entre corchetes por que es un array sino no lo identificaría como un string lo que cambia en el valor de la constante
+      setUserLetter([...userLetter, ev.target.value]);
+    }
+    else{
+      setLastLetter('');
     }
   };
 
-//CONTADOR ERRORES
-  // const getNumberOfErrors = () => {
-  //   const errorLetters = userLetters.filter(
-  //     (letter) => word.includes(letter) === false
-  //   );
-  //   return errorLetters.length;
-  // };
-  
-  const inputLetter = (ev) => {
-    
-    let regex = new RegExp("^[a-zA-Z ]+$");
+  // Con esta función estamos pintando las letras falladas, pero nos pinta la misma letra si se la ponemos en minúscula y si se la ponemos en mayus también la pinta
 
-    if (regex.test(ev.target.value || ev.target.value === '')) {
-    // handleLastLetter(ev.target.value);
-    setLastLetter(ev.target.value);
-  }
-  };
+  const renderErrorLetters = () => {
+    const errorLetter = 
+    userLetter.filter((eachUserLetter) => !word.toLocaleLowerCase().includes(eachUserLetter.toLocaleLowerCase()) )
+        return errorLetter.map((letter, index) => {
+          return <li key={index} className="letter">{letter}</li>
+        })
+      };
 
-  // funcion handleLastLetter por que la creamos.
-
-//   const handleLastLetter = (value) => {
-//     value = value.toLocaleLowerCase();
-//     setLastLetter(value);
-    
-//   if (!userLetters.includes(value)) {
-//     userLetters.push(value);
-//     setUserLetters([...userLetters]);
-//   }
-// }
-
-
-// RENDER DE ERRORES
-// const renderErrorLetters = () => {
-//   const errorLetters = userLetters.filter(
-//     (letter) =>
-//       word.toLocaleLowerCase().includes(letter.toLocaleLowerCase()) === false
-//   );
-//   return errorLetters.map((letter, index) => {
-//     return (
-//       <li key={index} className='letter'>
-//         {letter}
-//       </li>
-//     );
-//   });
-// };
-
-
-
-  const renderSolutionLetters = () => {
-    const wordLetters = word.split('');
-    return wordLetters.map((letter, index) => {
-      const exist = userLetters.includes(letter.toLocaleLowerCase())
-      return( 
-      <React.Fragment key={index}>
-      <li  className="letter">
-      {exist ? letter : ''}
-      </li>
-      </React.Fragment>);
-    });
-  };
+      
 
   return (
     <div className="App">
       <div className="page">
-      <header>
-        <h1 className="header__title">Juego del ahorcado</h1>
-      </header>
+      <Header juego='Juego del ahorcado'></Header>
       <main className="main">
         <section>
-          <div className="solution">
-            <h2 className="title">Solución:</h2>
-            <ul className="letters">
-              {renderSolutionLetters()}
-            </ul>
-          </div>
+          <SolutionLetters word={word} usserLetter={userLetter}></SolutionLetters>
           <div className="error">
             <h2 className="title">Letras falladas:</h2>
             <ul className="letters">
-              <li className="letter">f</li>
-              <li className="letter">q</li>
-              <li className="letter">h</li>
-              <li className="letter">p</li>
-              <li className="letter">x</li>
+              {renderErrorLetters()}
             </ul>
           </div>
           <form className="form" onSubmit={formSubmit}>
@@ -130,30 +94,16 @@ function App() {
               type="text"
               name="last-letter"
               id="last-letter"
-              onInput={inputLetter}
-              value = {lastLetter}
+              onChange= {handleInputLetter}
+              value= {lastLetter}
             />
-             <button onClick={increment}>Incrementar</button>
+             {/* Buton de prueba para incrementar los errores en en el ahorcado */}
+             {/* <button onClick={increment}>Incrementar</button> */}
           </form>
 
-         
+        </section>
+        <Dummy error={getNumberOfErrors()}></Dummy>
 
-        </section>
-        <section className={`dummy error-${numberOfErrors}`}>
-          <span className="error-13 eye"></span>
-          <span className="error-12 eye"></span>
-          <span className="error-11 line"></span>
-          <span className="error-10 line"></span>
-          <span className="error-9 line"></span>
-          <span className="error-8 line"></span>
-          <span className="error-7 line"></span>
-          <span className="error-6 head"></span>
-          <span className="error-5 line"></span>
-          <span className="error-4 line"></span>
-          <span className="error-3 line"></span>
-          <span className="error-2 line"></span>
-          <span className="error-1 line"></span>
-        </section>
       </main>
     </div>
     </div>
