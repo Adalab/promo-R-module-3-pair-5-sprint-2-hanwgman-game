@@ -1,6 +1,10 @@
 function Dummy(props) {
+    const getNumberOfErrors = () => {
+        const numberError = props.userLetter.filter((letter) => !props.word.includes(letter));
+        return numberError.length;
+      };
     return(
-        <section className={`dummy error-${props.error}`}>
+        <section className={`dummy error-${getNumberOfErrors()}`}>
             <span className="error-13 eye"></span>
             <span className="error-12 eye"></span>
             <span className="error-11 line"></span>
