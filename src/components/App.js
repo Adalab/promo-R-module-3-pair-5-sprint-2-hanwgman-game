@@ -2,12 +2,14 @@
 import '../styles/App.scss';
 import {useState, useEffect} from 'react';
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import callToApi from '../services/api';
 import Header from './Header';
 import SolutionLetters from './SolutionLetters';
 import ErrorLetters from './ErrorLetters';
 import Form from './Form';
 import Dummy from './Dummy';
+import Footer from './Footer'
 
 function App() {
   // Variable estado para almacenar la palabra que se deberá adivinar.
@@ -30,12 +32,17 @@ function App() {
       <Header juego='Juego del ahorcado'></Header>
       <main className="main">
         <section>
-          <SolutionLetters word={word} userLetter={userLetter}></SolutionLetters>
-          <ErrorLetters word={word} userLetter={userLetter} />
-          <Form setUserLetter={setUserLetter} userLetter={userLetter} />
+          <Routes>
+            <Route>
+              <SolutionLetters word={word} userLetter={userLetter}></SolutionLetters>
+              <ErrorLetters word={word} userLetter={userLetter} />
+              <Form setUserLetter={setUserLetter} userLetter={userLetter} />
+            </Route>
+          </Routes>
         </section>
         <Dummy userLetter={userLetter} word={word} ></Dummy>
       </main>
+      <Footer></Footer>
     </div>
     </div>
   );
