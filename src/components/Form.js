@@ -1,7 +1,7 @@
 import {useState} from 'react';
 
-function Form (props) {
-  const [lastLetter, setLastLetter] = useState('');
+function Form ({setUserLetter, userLetter, setLastLetter, lastLetter}) {
+  
 
   const formSubmit =(e)=>{
     e.preventDefault();
@@ -14,7 +14,7 @@ function Form (props) {
     if (regex.test(ev.target.value)){
       setLastLetter(ev.target.value);
       // ponemos entre corchetes por que es un array sino no lo identificaría como un string lo que cambia en el valor de la constante
-      props.setUserLetter([...props.userLetter, ev.target.value]);
+      setUserLetter([...userLetter, ev.target.value]);
     }
     else{
       setLastLetter('');

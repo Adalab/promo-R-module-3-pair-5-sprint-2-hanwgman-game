@@ -18,7 +18,7 @@ function App() {
   const [word, setWord] = useState('Katakroker');
   // Variable estado para para almacenar y pintar las letras que introduce la jugadora.
   const [userLetter, setUserLetter] = useState([]);
-
+  const [lastLetter, setLastLetter] = useState('');
 // Llamada a al Api 
 
   useEffect(() => {
@@ -27,7 +27,12 @@ function App() {
       console.log(response);
     });
   },[]);
+  const handleChange = (e) => {
+    setWord(e.target.value);
+    setUserLetter([]);
+    setLastLetter('');
 
+}
   return (
     <div className="App">
       <div className="page">
@@ -39,14 +44,14 @@ function App() {
                 <section>
                   <SolutionLetters word={word} userLetter={userLetter}></SolutionLetters>
                   <ErrorLetters word={word} userLetter={userLetter} />
-                  <Form setUserLetter={setUserLetter} userLetter={userLetter} />
+                  <Form setUserLetter={setUserLetter} userLetter={userLetter} setLastLetter={setLastLetter} lastLetter={lastLetter} />
                 </section>
         <Dummy userLetter={userLetter} word={word} ></Dummy>
           </>
         }>
         </Route>
         <Route path='/instructions' element={<Instructions />}></Route>
-        <Route path='/options' element={<Options />} ></Route>
+        <Route path='/options' element={<Options handleChange={handleChange}/>} ></Route>
       </Routes>
         
       </main>
